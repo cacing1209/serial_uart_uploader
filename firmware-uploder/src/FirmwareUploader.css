@@ -193,6 +193,81 @@
   word-break: break-word;
 }
 
+.monitor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.monitor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.monitor-header h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.monitor-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.monitor-baud {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.monitor-baud:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.monitor-log {
+  min-height: 120px;
+  max-height: 240px;
+}
+
+.monitor-send {
+  display: flex;
+  gap: 8px;
+}
+
+.monitor-send input[type='text'] {
+  flex: 1 1 auto;
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.monitor-send select {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.monitor-send input:disabled,
+.monitor-send select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (prefers-color-scheme: dark) {
   .status-error {
     color: #f87171;
