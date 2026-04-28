@@ -113,24 +113,50 @@
   color: var(--text-h);
 }
 
-.upload-btn {
+.action-row {
+  display: flex;
+  gap: 10px;
+}
+
+.upload-btn,
+.erase-btn {
+  flex: 1 1 auto;
   font: inherit;
   padding: 10px 16px;
   border-radius: 6px;
   border: 2px solid transparent;
-  background: var(--accent-bg);
-  color: var(--accent);
   cursor: pointer;
   transition: border-color 0.2s;
+}
+
+.upload-btn {
+  background: var(--accent-bg);
+  color: var(--accent);
 }
 
 .upload-btn:hover:not(:disabled) {
   border-color: var(--accent-border);
 }
 
-.upload-btn:disabled {
+.erase-btn {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.erase-btn:hover:not(:disabled) {
+  border-color: rgba(220, 38, 38, 0.5);
+}
+
+.upload-btn:disabled,
+.erase-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .erase-btn {
+    color: #f87171;
+  }
 }
 
 .status {

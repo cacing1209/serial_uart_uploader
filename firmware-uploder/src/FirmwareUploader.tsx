@@ -273,6 +273,73 @@ function FirmwareUploader() {
     setStatus({ kind: 'success', text: `Uploaded ${fwFile.name} successfully` })
   }
 
+  const eraseEsp = async (selectedPort: SerialPort) => {
+    setFlashLog('')
+
+    const transport = new Transport(selectedPort, true)
+    transportRef.current = transport
+
+    const esploader = new ESPLoader({
+      transport,
+      baudrate: parseInt(baudrate, 10),
+      terminal: flashTerminal,
+    })
+
+    const chip = await esploader.main()
+    appendFlashLog(`\nDetected chip: ${chip}\n`)
+    appendFlashLog('Erasing flash (this may take a while)...\n')
+
+    await esploader.eraseFlash()
+
+    appendFlashLog('\nErase complete.\n')
+    setStatus({ kind: 'success', text: 'EEPROM / flash erased successfully' })
+  }
+
+  const handleErase = async () => {
+    if (!board) {
+      setStatus({ kind: 'error', text: 'Please select a board first' })
+      return
+    }
+    if (!port) {
+      setStatus({ kind: 'error', text: 'Please connect a device first' })
+      return
+    }
+
+    const ok = window.confirm(
+      'This will erase the entire EEPROM / flash memory on the device. Continue?',
+    )
+    if (!ok) return
+
+    setBusy(true)
+    setProgress(null)
+    setStatus({ kind: 'info', text: 'Erasing EEPROM...' })
+
+    try {
+      if (monitorOpenRef.current) await closeMonitor()
+
+      if (board === 'esp') {
+        await eraseEsp(port)
+      } else {
+        await new Promise((r) => setTimeout(r, 800))
+        setStatus({
+          kind: 'info',
+          text: 'Arduino EEPROM erase is not implemented yet (UI only).',
+        })
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      setStatus({ kind: 'error', text: `Erase failed: ${msg}` })
+    } finally {
+      try {
+        await transportRef.current?.disconnect()
+      } catch {
+        /* ignore */
+      }
+      transportRef.current = null
+      setBusy(false)
+    }
+  }
+
   const handleUpload = async () => {
     if (!board) {
       setStatus({ kind: 'error', text: 'Please select a board first' })
@@ -425,14 +492,25 @@ function FirmwareUploader() {
         </div>
       )}
 
-      <button
-        type="button"
-        className="upload-btn"
-        onClick={handleUpload}
-        disabled={busy}
-      >
-        {busy ? 'Uploading…' : 'Upload'}
-      </button>
+      <div className="action-row">
+        <button
+          type="button"
+          className="upload-btn"
+          onClick={handleUpload}
+          disabled={busy}
+        >
+          {busy ? 'Working…' : 'Upload'}
+        </button>
+        <button
+          type="button"
+          className="erase-btn"
+          onClick={handleErase}
+          disabled={busy || !port || !board}
+          title="Erase the entire EEPROM / flash memory"
+        >
+          Erase EEPROM
+        </button>
+      </div>
 
       {progress !== null && (
         <div className="progress">
